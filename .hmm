@@ -1,0 +1,30 @@
+{
+	"type"              : "lib",
+	"template"          : "clean",
+	"pm"                : "bun",
+	"repo": {
+		"org"           : "cruxplug",
+		"name"          : "spa",
+		"version"       : "0.0.1",
+		"desc"          : "Single Page Application (SPA) plugin for CruxJS with built-in SEO/CEO support, E-E-A-T signals, and JSON-LD structured data generation.",
+		"kw"            : [
+			"cruxjs",
+			"plugins",
+			"single",
+			"page",
+			"application",
+			"spa"
+		],
+		"license"       : "MIT",
+		"issues"        : "https://github.com/cruxplug-org/spa/issues",
+		"homepage"      : "https://github.com/cruxplug-org/spa#readme",
+		"git_url"       : "git+https://github.com/cruxplug-org/spa.git"
+	},
+	"author": {
+		"id"            : "maysara-elshewehy",
+		"name"          : "Maysara",
+		"email"         : "maysara.elshewehy@gmail.com",
+		"url"           : "https://github.com/maysara-elshewehy"
+	},
+	"createdAt"         : "2026-01-06T12:48:00.071Z"
+}
