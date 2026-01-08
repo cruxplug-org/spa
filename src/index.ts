@@ -34,7 +34,8 @@
      * const spaPlugin = serverSPA({
      *   baseUrl: 'https://example.com',
      *   clientEntry: './src/client/browser.tsx',
-     *   clientScriptPath: '/static/dist/js/browser.js',
+     *   clientScriptPath: '/static/dist/js/min.js',
+     *   clientStylePath: '/static/dist/css/min.css',
      *   enableAutoNotFound: true,  // Auto-handle 404s
      *   pages: [
      *     {

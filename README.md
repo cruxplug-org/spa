@@ -8,7 +8,7 @@
 </div>
 
 <div align="center">
-    <img src="https://img.shields.io/badge/v-0.0.2-black"/>
+    <img src="https://img.shields.io/badge/v-0.0.3-black"/>
     <img src="https://img.shields.io/badge/🔥-@cruxplug-black"/>
     <br>
     <img src="https://img.shields.io/badge/coverage----%25-brightgreen" alt="Test Coverage" />
@@ -59,7 +59,8 @@
             const spaPlugin = serverSPA({
                 baseUrl: 'https://example.com',
                 clientEntry: './src/client/browser.tsx',
-                clientScriptPath: '/static/dist/js/browser.js',
+                clientScriptPath: ['/static/dist/js/app.js'],
+                clientStylePath: ['/static/dist/css/style.css'],
                 enableAutoNotFound: true,
                 pages: [
                     {
@@ -85,7 +86,8 @@
             ```typescript
             const spaPlugin = serverSPA({
                 baseUrl: 'https://example.com',
-                clientScriptPath: '/js/app.js',
+                clientScriptPath: ['/js/app.js'],
+                clientStylePath: ['/css/min.css'],
                 clientEntry: './src/client/index.tsx',
                 author: 'Your Company Name',
                 authorUrl: 'https://example.com/about',
@@ -108,7 +110,8 @@
             ```typescript
             const spaPlugin = serverSPA({
                 baseUrl: 'https://example.com',
-                clientScriptPath: '/js/app.js',
+                clientScriptPath: ['/js/app.js'],
+                clientStylePath: ['/css/min.css'],
                 clientEntry: './src/client/index.tsx',
                 enableAutoNotFound: true,
                 errorPages: [
@@ -140,7 +143,8 @@
 
         **Parameters:**
         - `baseUrl`: Base URL for canonical links and SEO (required)
-        - `clientScriptPath`: Path to client-side JS bundle (required)
+        - `clientScriptPath`: Array of paths to client-side JS bundles (required)
+        - `clientStylePath`: Array of paths to client-side CSS files (optional)
         - `clientEntry`: Path to client entry point (required)
         - `pages`: Array of pages to serve as SPA (optional)
         - `errorPages`: Array of error page configurations (optional)
@@ -156,7 +160,8 @@
         ```typescript
         const plugin = serverSPA({
             baseUrl: 'https://example.com',
-            clientScriptPath: '/js/app.js',
+            clientScriptPath: ['/js/app.js'],
+            clientStylePath: ['/css/min.css'],
             clientEntry: './src/client/index.tsx',
             enableAutoNotFound: true,
             pages: [
@@ -190,8 +195,9 @@
 
             // Content
             contentType?: 'article' | 'product' | 'service' | 'app' | 'workspace' | 'page';
-            clientScriptPath?: string; // Override client script path
-            clientEntry?: string;      // Override client entry
+            clientScriptPath?: string[]; // Override client script paths
+            clientStylePath?: string[];   // Override client style paths
+            clientEntry?: string;         // Override client entry
         }
         ```
 
@@ -213,7 +219,8 @@
             pages?: SPAPageConfig[];
             errorPages?: ErrorPageConfig[];
             clientEntry: string;
-            clientScriptPath: string;
+            clientScriptPath: string[];     // Array of script paths
+            clientStylePath?: string[];     // Array of style paths
             author?: string;
             authorUrl?: string;
             defaultDescription?: string;
@@ -252,7 +259,8 @@
         - Full HTML5 shell with doctype
         - Integrated SEO and structured data
         - App mount point (#app)
-        - Module script loading
+        - Multiple module script loading (from array)
+        - Multiple stylesheet loading (from array)
 
     - #### `createSPARoute(pageConfig, baseConfig): RouteDefinition`
         > Creates CruxJS route definition

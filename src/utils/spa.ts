@@ -23,23 +23,33 @@
      * - SEO meta tags
      * - Structured data (JSON-LD)
      * - App mount point (#app)
-     * - Client-side JavaScript entry point
+     * - Client-side JavaScript and style entry points
      */
     export function generateSPAHTML(
         pageConfig: SPAPageConfig,
         baseConfig: ServerSPAPluginConfig
     ): string {
-        const clientScript = pageConfig.clientScriptPath || baseConfig.clientScriptPath;
+        const clientScripts = pageConfig.clientScriptPath || baseConfig.clientScriptPath;
+        const clientStyles = pageConfig.clientStylePath || baseConfig.clientStylePath || [];
+
+        const scriptTags = clientScripts
+            .map(script => `    <script type="module" src="${script}"></script>`)
+            .join('\n');
+
+        const styleTags = clientStyles
+            .map(style => `    <link rel="stylesheet" href="${style}" />`)
+            .join('\n');
 
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
     ${generateSEOMetaTags(pageConfig, baseConfig)}
     ${generateStructuredData(pageConfig, baseConfig, pageConfig.contentType === 'article' ? 'Article' : 'WebPage')}
+    ${styleTags ? styleTags : ''}
 </head>
 <body>
     <div id="app"></div>
-    <script type="module" src="${clientScript}"></script>
+${scriptTags}
 </body>
 </html>`;
     }

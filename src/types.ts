@@ -34,7 +34,8 @@
 
         // App entry point
         clientEntry?: string;
-        clientScriptPath?: string;
+        clientScriptPath?: string[];
+        clientStylePath?: string[];
     }
 
     /**
@@ -59,9 +60,10 @@
         // Error pages configuration (404, 500, etc.)
         errorPages?: ErrorPageConfig[];
 
-        // Client entry point (where React/Vue/etc mounts)
+        // Client entry point (where cruxjs mounts)
         clientEntry: string;
-        clientScriptPath: string;
+        clientScriptPath: string[];
+        clientStylePath?: string[];
 
         // Author for structured data
         author?: string;

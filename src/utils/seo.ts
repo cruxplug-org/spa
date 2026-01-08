@@ -57,7 +57,7 @@
 
         <!-- 🔗 Canonical & Prefetch -->
         <link rel="canonical" href="${canonicalUrl}" />
-        <link rel="prefetch" href="${config.clientScriptPath || baseConfig.clientScriptPath}" />
+        ${(config.clientScriptPath || baseConfig.clientScriptPath)?.map(script => `<link rel="prefetch" href="${script}" />`).join('\n        ')}
 
         <!-- ⚡ Performance & Security -->
         <meta name="format-detection" content="telephone=no" />
