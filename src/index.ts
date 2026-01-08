@@ -14,7 +14,7 @@
     } from '@cruxjs/base';
 
     import * as types from './types';
-    import { generateSPAHTML, createSPARoute } from './utils/spa';
+    import { createSPARoute } from './utils/spa';
     import { createErrorHandler, createDefault404Page } from './utils/errors';
 
 // ╚══════════════════════════════════════════════════════════════════════════════════════╝
