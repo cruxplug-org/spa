@@ -5,7 +5,7 @@
 	"repo": {
 		"org"           : "cruxplug",
 		"name"          : "spa",
-		"version"       : "0.0.6",
+		"version"       : "0.0.7",
 		"desc"          : "Single Page Application (SPA) plugin for CruxJS with built-in SEO/CEO support, E-E-A-T signals, and JSON-LD structured data generation.",
 		"kw"            : [
 			"cruxjs",

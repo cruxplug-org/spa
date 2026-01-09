@@ -17,7 +17,7 @@
     import { createSPARoute } from './utils/spa';
     import { createErrorHandler, createDefault404Page } from './utils/errors';
 
-    export * from './types';
+    export type * from './types';
 
 // ╚══════════════════════════════════════════════════════════════════════════════════════╝
 
