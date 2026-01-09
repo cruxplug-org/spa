@@ -81,4 +81,4 @@ declare function serverSPA(config: ServerSPAPluginConfig): CruxPlugin & {
     __spaErrorHandler?: any;
 };
 
-export { serverSPA };
+export { type ErrorPageConfig, type SPAPageConfig, type ServerSPAPluginConfig, serverSPA };
