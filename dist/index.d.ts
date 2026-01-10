@@ -3,15 +3,24 @@ import { CruxPlugin } from '@cruxjs/base';
 /**
  * SEO Configuration for SPA routes
  * Supports modern E-E-A-T signals and AI Search optimization
+ *
+ * Translation Support:
+ * - title: Use genPageTitle() for RTL-aware page titles
+ * - description, keywords, etc: Use t() for translations
+ *
+ * Meta tag values can be:
+ * - Direct string: 'My Title' or 'my.translation.key'
+ * - Array [key, fallback]: ['my.key', 'Fallback Title']
+ * - Array [key]: ['my.key'] (no fallback)
  */
 interface SPAPageConfig {
-    title: string;
+    title: string | string[];
     path: string;
-    description?: string;
-    keywords?: string[];
-    expertise?: string;
-    experience?: string;
-    authority?: string;
+    description?: string | string[];
+    keywords?: (string | string[])[];
+    expertise?: string | string[];
+    experience?: string | string[];
+    authority?: string | string[];
     contentType?: 'article' | 'product' | 'service' | 'app' | 'workspace' | 'page';
     ogImage?: string;
     canonical?: string;
@@ -23,6 +32,10 @@ interface SPAPageConfig {
 /**
  * Error Page Configuration
  * Define custom error pages (404, 500, etc.)
+ *
+ * Supports same translation format as SPAPageConfig:
+ * - title: ['meta.error.title', 'Default Title']
+ * - description: ['meta.error.desc']
  */
 interface ErrorPageConfig extends SPAPageConfig {
     statusCode: number;
@@ -51,33 +64,37 @@ interface ServerSPAPluginConfig {
  * Generates SPA routes with SEO/CEO metadata and structured data
  * Error pages are handled via CruxJS error hooks
  *
+ * Features:
+ * - Server-side rendering with full SEO support (meta tags, structured data)
+ * - Automatic error page handling (404, 500, etc.)
+ *
  * @example
  * ```typescript
  * const spaPlugin = serverSPA({
- *   baseUrl: 'https://example.com',
- *   clientEntry: './src/client/browser.tsx',
- *   clientScriptPath: '/static/dist/js/min.js',
- *   clientStylePath: '/static/dist/css/min.css',
- *   enableAutoNotFound: true,  // Auto-handle 404s
+ *   baseUrl            : 'https://example.com',
+ *   clientEntry        : './src/client/browser.tsx',
+ *   clientScriptPath   : ['/static/dist/js/browser.js'],
+ *   clientStylePath    : ['/static/dist/css/index.css'],
+ *   enableAutoNotFound : true,
  *   pages: [
  *     {
- *       title: 'Home',
- *       path: '/',
- *       description: 'Welcome to our platform'
+ *       title          : 'Home',
+ *       path           : '/',
+ *       description    : 'Welcome to our platform'
  *     }
  *   ],
  *   errorPages: [
  *     {
- *       statusCode: 404,
- *       title: '404 - Not Found',
- *       path: '/404',
- *       description: 'Page not found'
+ *       statusCode     : 404,
+ *       title          : '404 - Not Found',
+ *       path           : '/404',
+ *       description    : 'Page not found'
  *     }
  *   ]
  * });
  * ```
  */
-declare function serverSPA(config: ServerSPAPluginConfig): CruxPlugin & {
+declare function serverSPA(config: ServerSPAPluginConfig, appConfig?: any): CruxPlugin & {
     __spaErrorHandler?: any;
 };
 

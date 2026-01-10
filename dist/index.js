@@ -1,48 +1,57 @@
-function l(e,t){let n=e.canonical||`${t.baseUrl}${e.path}`,o=e.robots||t.defaultRobots||"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",a=e.description||t.defaultDescription||"A modern single-page application",r=(e.keywords||t.defaultKeywords||[]).join(", ");return `
-        <!-- \u{1F50D} Core SEO Meta Tags -->
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="${a}" />
-        ${r?`<meta name="keywords" content="${r}" />`:""}
-        <meta name="robots" content="${o}" />
-        <meta name="language" content="en" />
-        <meta http-equiv="content-language" content="en-us" />
-
-        <!-- \u{1F465} E-E-A-T Signals for AI Search -->
-        ${t.author?`<meta name="author" content="${t.author}" />`:""}
-        ${e.expertise?`<meta name="expertise" content="${e.expertise}" />`:""}
-        ${e.experience?`<meta name="experience" content="${e.experience}" />`:""}
-        ${e.authority?`<meta name="authority" content="${e.authority}" />`:""}
-
-        <!-- \u{1F4F1} Mobile & Performance -->
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="theme-color" content="#000000" />
-
-        <!-- \u{1F517} Canonical & Prefetch -->
-        <link rel="canonical" href="${n}" />
-        ${(e.clientScriptPath||t.clientScriptPath)?.map(s=>`<link rel="prefetch" href="${s}" />`).join(`
-        `)}
-
-        <!-- \u26A1 Performance & Security -->
-        <meta name="format-detection" content="telephone=no" />
-        <meta http-equiv="x-ua-compatible" content="IE=edge" />
-        ${e.ogImage?`<meta property="og:image" content="${e.ogImage}" />`:""}
-        <meta property="og:title" content="${e.title}" />
-        <meta property="og:description" content="${a}" />
-        <meta property="og:url" content="${n}" />`}function c(e,t,n="WebPage"){let o=e.canonical||`${t.baseUrl}${e.path}`,a={"@context":"https://schema.org","@type":n,name:e.title,url:o,description:e.description||t.defaultDescription,inLanguage:"en",...e.contentType&&{genre:e.contentType},...t.author&&{author:{"@type":"Person",name:t.author,...t.authorUrl&&{url:t.authorUrl}}},...(e.expertise||e.experience||e.authority)&&{creator:{"@type":"Person",name:t.author||"Unknown",...e.expertise&&{expertise:e.expertise},...e.experience&&{experience:e.experience},...e.authority&&{authority:e.authority}}}};return `<script type="application/ld+json">${JSON.stringify(a,null,2)}</script>`}function p(e,t){let n=e.clientScriptPath||t.clientScriptPath,o=e.clientStylePath||t.clientStylePath||[],a=n.map(s=>`    <script type="module" src="${s}"></script>`).join(`
-`),r=o.map(s=>`    <link rel="stylesheet" href="${s}" />`).join(`
-`);return `<!DOCTYPE html>
+var E=class{constructor(e){this.translations={},this.currentLanguage="en",this.defaultLanguage="en",this.fallbackLanguage="en",this.supportedLanguages=new Set(["en"]),this.rtlLanguages=new Set(["ar","he","fa","ur","yi","ji","iw","ku"]),this.listeners=new Set,e&&(this.defaultLanguage=e.defaultLanguage||"en",this.fallbackLanguage=e.fallbackLanguage||e.defaultLanguage||"en",this.currentLanguage=e.defaultLanguage||"en",this.storage=e.storage,this.onLanguageChange=e.onLanguageChange,e.supportedLanguages&&(this.supportedLanguages=new Set(e.supportedLanguages)));}async init(){if(this.storage){let e=await this.storage.get("i18n-language");e&&this.supportedLanguages.has(e)&&(this.currentLanguage=e);}}loadLanguage(e,t){this.translations[e]||(this.translations[e]={});let n=this.flattenObject(t);this.translations[e]={...this.translations[e],...n},this.supportedLanguages.add(e);}loadTranslations(e){Object.entries(e).forEach(([t,n])=>{this.loadLanguage(t,n);});}flattenObject(e,t=""){let n={};for(let a in e){if(!Object.prototype.hasOwnProperty.call(e,a))continue;let r=e[a],o=t?`${t}.${a}`:a;typeof r=="object"&&r!==null&&!Array.isArray(r)?Object.assign(n,this.flattenObject(r,o)):n[o]=String(r);}return n}t(e,t){let n=this.getTranslation(e);return t&&Object.entries(t).forEach(([a,r])=>{let o=this.getTranslation(r,r);n=n.replace(new RegExp(`\\{${a}\\}`,"g"),o);}),n}getTranslation(e,t){return this.translations[this.currentLanguage]?.[e]?this.translations[this.currentLanguage][e]:this.fallbackLanguage!==this.currentLanguage&&this.translations[this.fallbackLanguage]?.[e]?this.translations[this.fallbackLanguage][e]:this.defaultLanguage!==this.currentLanguage&&this.defaultLanguage!==this.fallbackLanguage&&this.translations[this.defaultLanguage]?.[e]?this.translations[this.defaultLanguage][e]:(console.warn(`[i18n] Translation key not found: "${e}" (lang: ${this.currentLanguage})`),t||e)}tLang(e,t,n){let a=this.currentLanguage;this.currentLanguage=t;let r=this.t(e,n);return this.currentLanguage=a,r}tParse(e,t){let n=this.t(e,t);n=n.replace(/\\n|\/n/g,"<br>");let a=[],r=/<([a-z]+)>([^<]*)<\/\1>|<([a-z]+)\s*\/?>|([^<]+)/gi,o;for(;(o=r.exec(n))!==null;)o[4]?a.push({type:"text",content:o[4]}):o[1]?a.push({type:"tag",tag:o[1],content:o[2]}):o[3]&&a.push({type:"tag",tag:o[3],content:""});return a.length>0?a:[{type:"text",content:n}]}async setLanguage(e){if(!this.supportedLanguages.has(e)){console.warn(`[i18n] Language "${e}" not supported`);return}this.currentLanguage=e,this.storage&&await this.storage.set("i18n-language",e),this.listeners.forEach(t=>t(e)),this.onLanguageChange&&this.onLanguageChange(e);}getLanguage(){return this.currentLanguage}getSupportedLanguages(){return Array.from(this.supportedLanguages)}isLanguageSupported(e){return this.supportedLanguages.has(e)}hasKey(e){return !!(this.translations[this.currentLanguage]?.[e]||this.translations[this.fallbackLanguage]?.[e]||this.translations[this.defaultLanguage]?.[e])}getTranslations(){return this.translations[this.currentLanguage]||{}}isRTL(){return this.rtlLanguages.has(this.currentLanguage.toLowerCase().substring(0,2))}isRTLLanguage(e){return this.rtlLanguages.has(e.toLowerCase().substring(0,2))}onChange(e){return this.listeners.add(e),()=>this.listeners.delete(e)}};var f=null;function y(){return f||(f=new E),f}var h=(e,t)=>y().t(e,t);var k=()=>y().isRTL();function L(e,t="page."){let n=h("app.name"),a=h(t+e);return k()?`${n} - ${a}`:`${a} - ${n}`}function c(e,t=""){if(!e)return t;if(Array.isArray(e)){let[n,a]=e;if(!n)return a||t;try{return h(n)||a||n||t}catch{return a||n||t}}try{return h(e)||e}catch{return e}}function v(e){return !e||e.length===0?"":e.map(n=>{if(typeof n=="string")return n;if(Array.isArray(n)){let[a,r]=n;if(!a)return r||"";try{return h(a)||r||a}catch{return r||a}}return ""}).filter(Boolean).join(", ")}function P(e){if(!e)return "Page";let t="";Array.isArray(e)?t=e[0]||"":t=e;try{return L(t,"")}catch{return Array.isArray(e)?e[1]||e[0]||"Page":e}}function S(e,t){let n=e.canonical||`${t.baseUrl}${e.path}`,a=e.robots||t.defaultRobots||"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",r=P(e.title),o=c(e.description,t.defaultDescription||"A modern single-page application"),i=v(e.keywords||t.defaultKeywords),s=c(e.expertise,""),l=c(e.experience,""),g=c(e.authority,""),u=e.contentType==="article"?"article":"website";return `<!-- \u{1F50D} Core SEO Meta Tags -->
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>${r}</title>
+                <meta name="description" content="${o}" />
+                ${i?`<meta name="keywords" content="${i}" />`:""}
+                <meta name="robots" content="${a}" />
+                <meta name="language" content="en" />
+                <meta http-equiv="content-language" content="en-us" />
+                <!-- \u{1F465} E-E-A-T Signals for AI Search -->
+                ${t.author?`<meta name="author" content="${t.author}" />`:""}
+                ${s?`<meta name="expertise" content="${s}" />`:""}
+                ${l?`<meta name="experience" content="${l}" />`:""}
+                ${g?`<meta name="authority" content="${g}" />`:""}
+                <!-- \u{1F4F1} Mobile & Performance -->
+                <meta name="mobile-web-app-capable" content="yes" />
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+                <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+                <meta name="theme-color" content="#000000" />
+                <!-- \u{1F517} Canonical & Prefetch -->
+                <link rel="canonical" href="${n}" />
+                ${(e.clientScriptPath||t.clientScriptPath)?.map(p=>`<link rel="prefetch" href="${p}" />`).join(`
+`)}
+                <!-- \u26A1 Performance & Security -->
+                <meta name="format-detection" content="telephone=no" />
+                <meta http-equiv="x-ua-compatible" content="IE=edge" />
+                <!-- \u{1F4D8} Open Graph Protocol (Social Media) -->
+                <meta property="og:type" content="${u}" />
+                <meta property="og:title" content="${r}" />
+                <meta property="og:description" content="${o}" />
+                <meta property="og:url" content="${n}" />
+                <meta property="og:locale" content="en_US" />
+                ${t.author?`<meta property="og:site_name" content="${t.author}" />`:""}
+                ${e.ogImage?`<meta property="og:image" content="${e.ogImage}" />`:""}
+                ${e.ogImage?`<meta property="og:image:alt" content="${r}" />`:""}
+        `}function b(e,t,n="WebPage"){let a=e.canonical||`${t.baseUrl}${e.path}`,r=P(e.title),o=c(e.description,t.defaultDescription),i=c(e.expertise,""),s=c(e.experience,""),l=c(e.authority,""),g={"@context":"https://schema.org","@type":n,name:r,url:a,description:o,inLanguage:"en",...e.contentType&&{genre:e.contentType},...t.author&&{author:{"@type":"Person",name:t.author,...t.authorUrl&&{url:t.authorUrl}}},...(i||s||l)&&{creator:{"@type":"Person",name:t.author||"Unknown",...i&&{expertise:i},...s&&{experience:s},...l&&{authority:l}}}};return `<script type="application/ld+json">
+${JSON.stringify(g,null,2).split(`
+`).map(p=>p&&`    ${p}`).join(`
+`)}
+</script>`}var j=["area","base","br","col","embed","hr","img","input","link","meta","param","source","track","wbr"];function R(e){let t=[],n=/(<[^>]+>)|([^<]+)/g,a;for(;(a=n.exec(e))!==null;)a[1]?t.push({type:"tag",value:a[1]}):a[2]&&a[2].trim().length>0&&t.push({type:"text",value:a[2]});return t}function M(e,t=4){let n=" ".repeat(t),a=[],r=0;for(let o=0;o<e.length;o++){let i=e[o],s=i.value.trim();s.startsWith("</")&&(r=Math.max(0,r-1));let l=n.repeat(r);if(!(i.type==="text"&&s.length===0)&&(i.type==="text"&&a.length>0&&!a[a.length-1].trim().endsWith(">")?a[a.length-1]+=s:a.push(l+s),s.startsWith("<")&&!s.startsWith("</"))){if(s.startsWith("<!DOCTYPE")||s.startsWith("<!--"))continue;let g=s.match(/<([A-Za-z][A-Za-z0-9\\-]*)/i),u=g?g[1].toLowerCase():"",p=j.includes(u),T=s.endsWith("/>");!p&&!T&&r++;}}return a}function w(e,t=4){let n=e.split(`
+`).map(o=>o.trim()).filter(o=>o.length>0).join(""),a=R(n);return M(a,t).join(`
+`)}function O(e){let t={defaultLanguage:e?.defaultLanguage||"en",supportedLanguages:e?.supportedLanguages||["en"],basePath:e?.basePath||"i18n/",fileExtension:e?.fileExtension||"json"},n=t.basePath;return n=n.replace(/\\/g,"/"),n.includes("shared/static")?n="static"+(n.split("shared/static")[1]||""):n.startsWith("./")?n=n.slice(2):n.startsWith("/")&&(n=n.slice(1)),n.endsWith("/")||(n+="/"),`<meta name="app-i18n" content='${JSON.stringify({defaultLanguage:t.defaultLanguage,supportedLanguages:t.supportedLanguages,basePath:n,fileExtension:t.fileExtension})}' />`}function m(e,t,n){let a=e.clientScriptPath||t.clientScriptPath,r=e.clientStylePath||t.clientStylePath||[],o=a.map(u=>`<script type="module" src="${u}"></script>`).join(`
+`),i=r.map(u=>`<link rel="stylesheet" href="${u}" />`).join(`
+`),s=O(n);s||console.warn("[SPA] WARNING: i18n meta tag is empty!");let l=`<!DOCTYPE html>
 <html lang="en">
 <head>
-    ${l(e,t)}
-    ${c(e,t,e.contentType==="article"?"Article":"WebPage")}
-    ${r||""}
+${S(e,t)}
+${b(e,t,e.contentType==="article"?"Article":"WebPage")}
+${s}
+${i}
 </head>
 <body>
-    <div id="app"></div>
-${a}
+<div id="app"></div>
+${o}
 </body>
-</html>`}function i(e,t){return {method:"GET",path:e.path,handler:n=>{let o=p(e,t);return n.html(o)}}}function P(e,t,n,o){if(o.startsWith("/api/"))return {status:e,headers:{"Content-Type":"application/json"},body:JSON.stringify({error:`Error ${e}`})};if(t.has(e)){let a=t.get(e),r=p(a,n);return {status:e,headers:{"Content-Type":"text/html; charset=utf-8"},body:r}}return {status:e,headers:{"Content-Type":"text/plain"},body:`Error ${e}`}}function u(e,t){return (n,o)=>{let a=P(n,e,t,o);return new Response(a.body,{status:a.status,headers:a.headers})}}function m(){return {statusCode:404,title:"404 - Page Not Found",path:"/404",description:"The page you are looking for could not be found.",keywords:["404","not found","error"],robots:"noindex, nofollow"}}function $(e){let t=[],n=new Map;if(e.pages&&e.pages.length>0)for(let r of e.pages)t.push(i(r,e));if(e.errorPages&&e.errorPages.length>0)for(let r of e.errorPages)n.set(r.statusCode,r),t.push(i(r,e));if(e.enableAutoNotFound&&!n.has(404)){let r=m();n.set(404,r),t.push(i(r,e));}let o=u(n,e);return {name:"@cruxplug/SPA",version:"0.1.0",routes:t,__spaErrorHandler:o,onRegister:async r=>{if(console.log(`[SPA Plugin] Registered ${t.length} SPA routes`),n.size>0){let s=Array.from(n.keys()).join(", ");console.log(`[SPA Plugin] Error pages configured for: ${s}`);}},onAwake:async r=>{console.log("[SPA Plugin] Awake phase - SPA routes ready");},onStart:async r=>{console.log("[SPA Plugin] Start phase - serving SPA");},onReady:async r=>{console.log("[SPA Plugin] Ready phase - SPA is fully operational");}}}export{$ as serverSPA};//# sourceMappingURL=index.js.map
+</html>`;l.includes("app-i18n")||console.error("[SPA] ERROR: i18n meta tag NOT in raw HTML!");let g=w(l);return g.includes("app-i18n")||console.error("[SPA] ERROR: i18n meta tag LOST during formatting!"),g}function d(e,t,n){return {method:"GET",path:e.path,handler:a=>{let r=m(e,t,n);return a.html(r)}}}function I(){return global.__cruxjs_i18n_config}function A(e){global.__cruxjs_i18n_config=e;}function C(e,t,n,a){if(a.startsWith("/api/"))return {status:e,headers:{"Content-Type":"application/json"},body:JSON.stringify({error:`Error ${e}`})};if(t.has(e)){let r=t.get(e),o=I();console.log(`[Errors] Generating error page ${e} with i18n:`,!!o);let i=m(r,n,o);return {status:e,headers:{"Content-Type":"text/html; charset=utf-8"},body:i}}return console.log(`[Errors] No custom error page for ${e}, returning fallback`),{status:e,headers:{"Content-Type":"text/plain"},body:`Error ${e}`}}function x(e,t){return (n,a)=>{let r=C(n,e,t,a);return new Response(r.body,{status:r.status,headers:r.headers})}}function $(){return {statusCode:404,title:"404 - Page Not Found",path:"/404",description:"The page you are looking for could not be found.",keywords:["404","not found","error"],robots:"noindex, nofollow"}}function Y(e,t){let n=[],a=new Map;A(t?.i18n);let r=t?.i18n;if(e.pages&&e.pages.length>0)for(let s of e.pages)n.push(d(s,e,r));if(e.errorPages&&e.errorPages.length>0)for(let s of e.errorPages)a.set(s.statusCode,s),n.push(d(s,e,r));if(e.enableAutoNotFound&&!a.has(404)){let s=$();a.set(404,s),n.push(d(s,e,r));}let o=x(a,e);return {name:"@cruxplug/SPA",version:"0.1.0",routes:n,__spaErrorHandler:o,onRegister:async s=>{if(console.log(`[SPA Plugin] Registered ${n.length} SPA routes`),a.size>0){let l=Array.from(a.keys()).join(", ");console.log(`[SPA Plugin] Error pages configured for: ${l}`);}},onAwake:async s=>{console.log("[SPA Plugin] Awake phase - SPA routes ready");},onStart:async s=>{console.log("[SPA Plugin] Start phase - serving SPA");},onReady:async s=>{console.log("[SPA Plugin] Ready phase - SPA is fully operational");}}}export{Y as serverSPA};//# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

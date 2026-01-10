@@ -8,10 +8,10 @@
 </div>
 
 <div align="center">
-    <img src="https://img.shields.io/badge/v-0.0.7-black"/>
-    <img src="https://img.shields.io/badge/🔥-@cruxplug-black"/>
+    <img src="https://img.shields.io/badge/v-0.0.8-black"/>
+    <a href="https://github.com/cruxjs-org"><img src="https://img.shields.io/badge/🔥-@cruxjs-black"/></a>
     <br>
-    <img src="https://img.shields.io/badge/coverage----%25-brightgreen" alt="Test Coverage" />
+    <img src="https://img.shields.io/badge/coverage-~%25-brightgreen" alt="Test Coverage" />
     <img src="https://img.shields.io/github/issues/cruxplug-org/spa?style=flat" alt="Github Repo Issues" />
     <img src="https://img.shields.io/github/stars/cruxplug-org/spa?style=social" alt="GitHub Repo stars" />
 </div>
@@ -23,256 +23,182 @@
 
 <!-- ╔══════════════════════════════ DOC ══════════════════════════════╗ -->
 
+- ## Overview 👀
+
+    - #### Why ?
+        > To provide a production-ready server-side SPA plugin with automatic SEO/CEO metadata generation, structured data (JSON-LD), error handling, and i18n integration for modern full-stack applications.
+
+    - #### When ?
+        > When you need to:
+        > - Serve SPA pages with full SEO support
+        > - Generate OpenGraph and structured data
+        > - Handle error pages (404, 500, etc.)
+        > - Inject i18n configuration from server to client
+        > - Support E-E-A-T signals for AI search
+        > - Generate beautiful, formatted HTML
+
+        > When you use [@cruxjs/app](https://github.com/cruxjs-org/app).
+
+    <br>
+    <br>
+
 - ## Quick Start 🔥
 
-    > A production-ready **CruxJS plugin** for serving Single Page Applications (SPAs) with built-in **SEO/CEO support**, **E-E-A-T signals**, and **JSON-LD structured data generation**.
+    > install [`hmm`](https://github.com/minejs-org/hmm) first.
 
-    > Advanced SEO metadata and AI Search optimization
+    ```bash
+    # in your terminal
+    hmm i @cruxjs/spa
+    ```
 
-    > Mobile-first meta tags and web app capabilities
+    <div align="center"> <img src="./assets/img/line.png" alt="line" style="display: block; margin-top:20px;margin-bottom:20px;width:500px;"/> </div>
 
-    > Structured data for rich snippets and knowledge panels
+    - #### Setup
 
-    > Automatic error page handling (404, 500, etc.)
+        > Create your SPA plugin configuration:
 
-    > Performance optimization (canonical URLs, prefetching)
+        ```typescript
+        import { serverSPA } from '@cruxjs/spa';
 
-    - ### Setup
+        const spaPlugin = serverSPA({
+            baseUrl             : 'http://localhost:3000',
+            clientEntry         : './src/app/client.ts',
+            clientScriptPath    : ['/static/dist/js/client.js'],
+            clientStylePath     : ['/static/dist/css/min.css'],
 
-        > install [`hmm`](https://github.com/maysara-elshewehy/hmm) first.
+            pages: [
+                {
+                    title       : 'Home - My App',
+                    path        : '/',
+                    description : 'Welcome to our application'
+                }
+            ],
 
-        ```bash
-        hmm i @cruxplug/spa
+            errorPages: [
+                {
+                    statusCode  : 404,
+                    title       : '404 - Not Found',
+                    path        : '/*',
+                    description : 'The page you\'re looking for doesn\'t exist'
+                }
+            ],
+
+        }, appConfig);
         ```
 
-    <div align="center"> <img src="./assets/img/line.png" alt="line" style="display: block; margin-top:20px;margin-bottom:20px;width:500px;"/> <br> </div>
+        <div align="center"> <img src="./assets/img/line.png" alt="line" style="display: block; margin-top:20px;margin-bottom:20px;width:500px;"/> </div>
+        <br>
 
-    - ### Usage
+    - #### Usage
 
-        ```ts
-        import { serverSPA } from '@cruxplug/spa';
+        > Add the plugin to your application:
+
+        ```typescript
+        import { createApp, AppConfig } from '@cruxjs/app';
+        import { serverSPA }            from '@cruxjs/spa';
+
+        const appConfig: AppConfig = {
+            debug               : true,
+            server              : { port: 3000, host: 'localhost' },
+            // ... rest of configuration
+        };
+
+        const spaPlugin = serverSPA({
+            baseUrl             : 'http://localhost:3000',
+            clientEntry         : './src/app/client.ts',
+            clientScriptPath    : ['/static/dist/js/client.js'],
+            clientStylePath     : ['/static/dist/css/min.css'],
+            pages               : [/* ... */],
+        }, appConfig);
+
+        appConfig.plugins!.push(spaPlugin);
+
+        const app = createApp(appConfig);
+        app.start();
         ```
 
-        - #### 1. Basic Usage
+        <div align="center"> <img src="./assets/img/line.png" alt="line" style="display: block; margin-top:20px;margin-bottom:20px;width:500px;"/> </div>
+
+        - #### Page Configuration with Translation Support
 
             ```typescript
-            const spaPlugin = serverSPA({
-                baseUrl: 'https://example.com',
-                clientEntry: './src/client/browser.tsx',
-                clientScriptPath: ['/static/dist/js/app.js'],
-                clientStylePath: ['/static/dist/css/style.css'],
-                enableAutoNotFound: true,
-                pages: [
-                    {
-                        title: 'Home',
-                        path: '/',
-                        description: 'Welcome to our platform',
-                        keywords: ['home', 'landing']
-                    },
-                    {
-                        title: 'About Us',
-                        path: '/about',
-                        description: 'Learn more about our company',
-                        contentType: 'page'
-                    }
-                ]
-            });
+            const pages: SPAPageConfig[] = [
+                {
+                    // Page metadata with translation support
+                    // Format: string | ['translationKey'] | ['translationKey', 'Fallback']
+                    title       : ['meta.home.title', 'Home'],
+                    path        : '/',
+                    description : ['meta.home.desc', 'Welcome to our platform'],
 
-            app.use(spaPlugin);
+                    // Keywords: strings are NOT translated, arrays ARE translated
+                    keywords: [
+                        'home',                           // Direct string - no translation
+                        ['meta.keywords.landing'],        // Translate this keyword
+                        ['meta.keywords.welcome', 'Welcome']  // With fallback
+                    ],
+
+                    // E-E-A-T Signals with translation support
+                    expertise   : 'Full-Stack Web Development',
+                    experience  : '2025+',
+                    authority   : ['meta.authority', 'CruxJS Framework'],
+
+                    // Content type for AI indexing
+                    contentType : 'page',
+
+                    // OpenGraph for social media
+                    ogImage     : 'http://localhost:3000/static/img/og-home.png',
+                    canonical   : 'http://localhost:3000/'
+                }
+            ];
             ```
 
-        - #### 2. With E-E-A-T Signals (for AI Search)
+        - #### Error Page Configuration with Translation Support
 
             ```typescript
-            const spaPlugin = serverSPA({
-                baseUrl: 'https://example.com',
-                clientScriptPath: ['/js/app.js'],
-                clientStylePath: ['/css/min.css'],
-                clientEntry: './src/client/index.tsx',
-                author: 'Your Company Name',
-                authorUrl: 'https://example.com/about',
-                pages: [
-                    {
-                        title: 'Blog Post',
-                        path: '/blog/seo-guide',
-                        description: 'Complete SEO guide for 2026',
-                        contentType: 'article',
-                        expertise: 'SEO and digital marketing',
-                        experience: '10+ years in the industry',
-                        authority: 'Published in major tech blogs'
-                    }
-                ]
-            });
-            ```
-
-        - ### 3. With Custom Error Pages
-
-            ```typescript
-            const spaPlugin = serverSPA({
-                baseUrl: 'https://example.com',
-                clientScriptPath: ['/js/app.js'],
-                clientStylePath: ['/css/min.css'],
-                clientEntry: './src/client/index.tsx',
-                enableAutoNotFound: true,
-                errorPages: [
-                    {
-                        statusCode: 404,
-                        title: '404 - Page Not Found',
-                        path: '/404',
-                        description: 'The page you're looking for doesn\'t exist',
-                        robots: 'noindex, nofollow'
-                    },
-                    {
-                        statusCode: 500,
-                        title: '500 - Server Error',
-                        path: '/500',
-                        description: 'Something went wrong on our end'
-                    }
-                ]
-            });
+            const errorPages: ErrorPageConfig[] = [
+                {
+                    statusCode  : 404,
+                    title       : ['meta.error.title', '404 - Page Not Found'],
+                    path        : '/*',
+                    description : ['meta.error.desc', 'The page you\'re looking for doesn\'t exist'],
+                    keywords    : ['error', '404', 'not found'],  // Direct strings - no translation
+                    robots      : 'noindex, nofollow',
+                    contentType : 'page'
+                },
+                {
+                    statusCode  : 500,
+                    title       : '500 - Server Error',
+                    path        : '/500',
+                    description : 'Something went wrong on our end'
+                }
+            ];
             ```
 
     <br>
+    <br>
 
-- ## API Reference 🔥
+- ## API Reference 📚
 
-    ### Core Plugin
+    - ### ..
 
-    - #### `serverSPA(config: ServerSPAPluginConfig): CruxPlugin`
-        > Creates and returns the SPA plugin with SEO support
-
-        **Parameters:**
-        - `baseUrl`: Base URL for canonical links and SEO (required)
-        - `clientScriptPath`: Array of paths to client-side JS bundles (required)
-        - `clientStylePath`: Array of paths to client-side CSS files (optional)
-        - `clientEntry`: Path to client entry point (required)
-        - `pages`: Array of pages to serve as SPA (optional)
-        - `errorPages`: Array of error page configurations (optional)
-        - `author`: Author name for structured data (optional)
-        - `authorUrl`: Author profile URL (optional)
-        - `enableAutoNotFound`: Auto-generate 404 page if true (optional, default: false)
-        - `defaultDescription`: Default SEO description (optional)
-        - `defaultKeywords`: Default SEO keywords array (optional)
-        - `defaultRobots`: Default robots meta tag (optional)
-
-        **Returns:** CruxPlugin with SEO support
-
-        ```typescript
-        const plugin = serverSPA({
-            baseUrl: 'https://example.com',
-            clientScriptPath: ['/js/app.js'],
-            clientStylePath: ['/css/min.css'],
-            clientEntry: './src/client/index.tsx',
-            enableAutoNotFound: true,
-            pages: [
-                { title: 'Home', path: '/', description: 'Home page' }
-            ]
-        });
+        ```ts
+        ..
         ```
 
-    ### Type Definitions
 
-    - #### `SPAPageConfig`
-        > Configuration for a single SPA page
+    <br>
+    <br>
 
-        ```typescript
-        interface SPAPageConfig {
-            // Required
-            title: string;              // Page title
-            path: string;               // Route path
+- ## Integration with @cruxjs/client 🔗
 
-            // SEO
-            description?: string;       // Meta description
-            keywords?: string[];        // Meta keywords array
-            ogImage?: string;          // Open Graph image URL
-            canonical?: string;        // Canonical URL
-            robots?: string;           // Robots meta tag
+    > When combined with [@cruxjs/client](https://github.com/cruxjs-org/client):
 
-            // E-E-A-T Signals (Google AI Overviews)
-            expertise?: string;        // Author's expertise
-            experience?: string;       // Author's experience
-            authority?: string;        // Author's authority
+    - ✅ i18n automatically injected via meta tag
+    - ✅ All plugin lifecycle hooks execute
+    - ✅ Routing immediately available
+    - ✅ Translations loaded before component render
+    - ✅ Zero boilerplate in user code
 
-            // Content
-            contentType?: 'article' | 'product' | 'service' | 'app' | 'workspace' | 'page';
-            clientScriptPath?: string[]; // Override client script paths
-            clientStylePath?: string[];   // Override client style paths
-            clientEntry?: string;         // Override client entry
-        }
-        ```
-
-    - #### `ErrorPageConfig`
-        > Configuration for error pages
-
-        ```typescript
-        interface ErrorPageConfig extends SPAPageConfig {
-            statusCode: number;  // HTTP status code (404, 500, etc.)
-        }
-        ```
-
-    - #### `ServerSPAPluginConfig`
-        > Main plugin configuration
-
-        ```typescript
-        interface ServerSPAPluginConfig {
-            baseUrl: string;
-            pages?: SPAPageConfig[];
-            errorPages?: ErrorPageConfig[];
-            clientEntry: string;
-            clientScriptPath: string[];     // Array of script paths
-            clientStylePath?: string[];     // Array of style paths
-            author?: string;
-            authorUrl?: string;
-            defaultDescription?: string;
-            defaultKeywords?: string[];
-            defaultRobots?: string;
-            enableAutoNotFound?: boolean;
-        }
-        ```
-
-    ### Utility Functions (Advanced)
-
-    - #### `generateSEOMetaTags(config, baseConfig): string`
-        > Generates SEO meta tags with E-E-A-T signals
-
-        **Features:**
-        - Core SEO metadata (charset, viewport, description, keywords)
-        - E-E-A-T signals for AI search optimization
-        - Mobile optimization (web app capable, status bar)
-        - Open Graph protocol tags
-        - Performance & security headers
-
-    - #### `generateStructuredData(pageConfig, baseConfig, contentType): string`
-        > Generates JSON-LD structured data
-
-        **Features:**
-        - Schema.org compatible data
-        - Support for multiple content types
-        - Rich snippets for search results
-        - Author and creator information
-        - AI overview optimization
-
-    - #### `generateSPAHTML(pageConfig, baseConfig): string`
-        > Generates complete HTML document
-
-        **Features:**
-        - Full HTML5 shell with doctype
-        - Integrated SEO and structured data
-        - App mount point (#app)
-        - Multiple module script loading (from array)
-        - Multiple stylesheet loading (from array)
-
-    - #### `createSPARoute(pageConfig, baseConfig): RouteDefinition`
-        > Creates CruxJS route definition
-
-    - #### `createErrorHandler(errorPageMap, baseConfig): Function`
-        > Creates error handler for CruxJS
-
-        **Features:**
-        - Differentiates API vs web requests
-        - JSON responses for `/api/*` routes
-        - Custom HTML pages for web requests
-        - Fallback error handling
 
 <!-- ╚═════════════════════════════════════════════════════════════════╝ -->
 
@@ -280,6 +206,7 @@
 
 <!-- ╔══════════════════════════════ END ══════════════════════════════╗ -->
 
+<br>
 <br>
 
 ---

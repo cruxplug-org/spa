@@ -9,20 +9,32 @@
     /**
      * SEO Configuration for SPA routes
      * Supports modern E-E-A-T signals and AI Search optimization
+     *
+     * Translation Support:
+     * - title: Use genPageTitle() for RTL-aware page titles
+     * - description, keywords, etc: Use t() for translations
+     *
+     * Meta tag values can be:
+     * - Direct string: 'My Title' or 'my.translation.key'
+     * - Array [key, fallback]: ['my.key', 'Fallback Title']
+     * - Array [key]: ['my.key'] (no fallback)
      */
     export interface SPAPageConfig {
         // Page metadata
-        title: string;
+        // For title: can be translated via genPageTitle(key) for RTL support
+        // Format: string | [translationKey] | [translationKey, fallback]
+        title: string | string[];
         path: string;
 
         // SEO configuration
-        description?: string;
-        keywords?: string[];
+        // Format: string | [translationKey] | [translationKey, fallback]
+        description?: string | string[];
+        keywords?: (string | string[])[];
 
         // E-E-A-T Signals (Google AI Overviews)
-        expertise?: string;
-        experience?: string;
-        authority?: string;
+        expertise?: string | string[];
+        experience?: string | string[];
+        authority?: string | string[];
 
         // Content type for AI indexing
         contentType?: 'article' | 'product' | 'service' | 'app' | 'workspace' | 'page';
@@ -41,6 +53,10 @@
     /**
      * Error Page Configuration
      * Define custom error pages (404, 500, etc.)
+     *
+     * Supports same translation format as SPAPageConfig:
+     * - title: ['meta.error.title', 'Default Title']
+     * - description: ['meta.error.desc']
      */
     export interface ErrorPageConfig extends SPAPageConfig {
         // HTTP status code for this error
