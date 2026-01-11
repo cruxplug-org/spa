@@ -8,7 +8,7 @@
 </div>
 
 <div align="center">
-    <img src="https://img.shields.io/badge/v-0.0.8-black"/>
+    <img src="https://img.shields.io/badge/v-0.0.9-black"/>
     <a href="https://github.com/cruxjs-org"><img src="https://img.shields.io/badge/🔥-@cruxjs-black"/></a>
     <br>
     <img src="https://img.shields.io/badge/coverage-~%25-brightgreen" alt="Test Coverage" />
@@ -125,22 +125,15 @@
             const pages: SPAPageConfig[] = [
                 {
                     // Page metadata with translation support
-                    // Format: string | ['translationKey'] | ['translationKey', 'Fallback']
-                    title       : ['meta.home.title', 'Home'],
+                    title       : 'meta.home.title',
                     path        : '/',
-                    description : ['meta.home.desc', 'Welcome to our platform'],
-
-                    // Keywords: strings are NOT translated, arrays ARE translated
-                    keywords: [
-                        'home',                           // Direct string - no translation
-                        ['meta.keywords.landing'],        // Translate this keyword
-                        ['meta.keywords.welcome', 'Welcome']  // With fallback
-                    ],
+                    description : 'meta.home.desc',
+                    keywords    : ['home', 'platform', 'app'],
 
                     // E-E-A-T Signals with translation support
                     expertise   : 'Full-Stack Web Development',
                     experience  : '2025+',
-                    authority   : ['meta.authority', 'CruxJS Framework'],
+                    authority   : 'meta.authority',
 
                     // Content type for AI indexing
                     contentType : 'page',
@@ -158,18 +151,17 @@
             const errorPages: ErrorPageConfig[] = [
                 {
                     statusCode  : 404,
-                    title       : ['meta.error.title', '404 - Page Not Found'],
+                    title       : 'meta.error.404.title',
                     path        : '/*',
-                    description : ['meta.error.desc', 'The page you\'re looking for doesn\'t exist'],
-                    keywords    : ['error', '404', 'not found'],  // Direct strings - no translation
+                    description : 'meta.error.404.desc',
                     robots      : 'noindex, nofollow',
                     contentType : 'page'
                 },
                 {
                     statusCode  : 500,
-                    title       : '500 - Server Error',
+                    title       : 'meta.error.500.title',
                     path        : '/500',
-                    description : 'Something went wrong on our end'
+                    description : 'meta.error.500.desc'
                 }
             ];
             ```

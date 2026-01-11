@@ -9,18 +9,17 @@ import { CruxPlugin } from '@cruxjs/base';
  * - description, keywords, etc: Use t() for translations
  *
  * Meta tag values can be:
- * - Direct string: 'My Title' or 'my.translation.key'
- * - Array [key, fallback]: ['my.key', 'Fallback Title']
- * - Array [key]: ['my.key'] (no fallback)
+ * - Direct string: 'My Title'
+ * - Translation key: 'my.translation.key'
  */
 interface SPAPageConfig {
-    title: string | string[];
+    title: string;
     path: string;
-    description?: string | string[];
-    keywords?: (string | string[])[];
-    expertise?: string | string[];
-    experience?: string | string[];
-    authority?: string | string[];
+    description?: string;
+    keywords?: string[];
+    expertise?: string;
+    experience?: string;
+    authority?: string;
     contentType?: 'article' | 'product' | 'service' | 'app' | 'workspace' | 'page';
     ogImage?: string;
     canonical?: string;

@@ -7,7 +7,8 @@
 // ╔════════════════════════════════════════ PACK ════════════════════════════════════════╗
 
     import type { SPAPageConfig, ServerSPAPluginConfig } from '../types';
-    import { t, genPageTitle } from '@minejs/i18n';
+    import { t } from '@minejs/server';
+    import { isRTL } from '@minejs/i18n';
 
 // ╚══════════════════════════════════════════════════════════════════════════════════════╝
 
@@ -16,73 +17,61 @@
 // ╔════════════════════════════════════════ UTIL ════════════════════════════════════════╗
 
     /**
-     * Detect and translate meta tag values
+     * Smart parser for string values
      *
-     * Smart detection for:
-     * - Direct string: 'My Title' → 'My Title'
-     * - Translation key: 'my.key' → t('my.key')
-     * - Array with key + fallback: ['my.key', 'Fallback'] → t('my.key', fallback)
-     * - Array with key only: ['my.key'] → t('my.key')
+     * Intelligently detects if a string is a translation key or plain text:
+     * - Translation key format (e.g., 'meta.home.title'): must contain dots, attempts translation via t(key)
+     * - Plain text (e.g., 'My Title', 'cruxjs', 'framework'): returns as-is
      *
-     * Returns the translated value or original string
+     * Key format: MUST contain at least one dot (.) to be considered a translation key
+     * Examples:
+     *   - 'meta.home.title' → translation key → tries t('meta.home.title')
+     *   - 'cruxjs' → plain text → returns 'cruxjs'
+     *   - 'My Title' → plain text → returns 'My Title'
+     *
+     * @param value - The string to parse
+     * @param defaultValue - Fallback if value is empty
+     * @returns Translated value or original string
      */
-    function resolveMetaValue(value: string | string[] | undefined, defaultValue: string = ''): string {
+    function parseValue(value: string | undefined, defaultValue: string = ''): string {
         if (!value) return defaultValue;
 
-        // Array format: [translationKey] or [translationKey, fallback]
-        if (Array.isArray(value)) {
-            const [key, fallback] = value;
-            if (!key) return fallback || defaultValue;
+        // Check if value looks like a translation key (e.g., 'meta.home.title')
+        // Key pattern: MUST contain at least one dot AND be lowercase/numeric/underscores/dots
+        const isTranslationKey = value.includes('.') && /^[a-z0-9._]+$/.test(value);
+
+        if (isTranslationKey) {
             try {
-                return t(key) || fallback || key || defaultValue;
+                const translated = t(value);
+                // If translation returns a value, use it; otherwise fall back to original
+                return translated || value;
             } catch {
-                return fallback || key || defaultValue;
+                // If translation fails, return the original value
+                return value;
             }
         }
 
-        // String format: could be direct value or translation key
-        // Try to translate first, if it fails/returns same value, treat as direct string
-        try {
-            const translated = t(value);
-            return translated || value;
-        } catch {
-            return value;
-        }
+        // Not a translation key format, return as direct text
+        return value;
+    }
+
+    /**
+     * Resolve meta tag values with smart translation detection
+     * Uses parseValue() to automatically detect and translate
+     */
+    function resolveMetaValue(value: string | undefined, defaultValue: string = ''): string {
+        return parseValue(value, defaultValue);
     }
 
     /**
      * Resolve keywords with smart translation detection
-     *
-     * Keywords can be:
-     * - Direct string: 'keyword' → 'keyword' (NO translation)
-     * - Translation array: ['meta.key'] or ['meta.key', 'fallback'] → translate it
-     *
-     * This allows keywords: ['404', 'error', 'not found'] without translation
-     * And also: [['meta.keywords.error'], ['meta.keywords.notfound']] with translation
+     * Uses parseValue() on each keyword to automatically detect and translate
      */
-    function resolveKeywords(keywords: (string | string[])[] | undefined): string {
+    function resolveKeywords(keywords: string[] | undefined): string {
         if (!keywords || keywords.length === 0) return '';
 
         const resolved = keywords
-            .map(kw => {
-                // String format: use as-is, don't translate
-                if (typeof kw === 'string') {
-                    return kw;
-                }
-
-                // Array format: translate the keyword
-                if (Array.isArray(kw)) {
-                    const [key, fallback] = kw;
-                    if (!key) return fallback || '';
-                    try {
-                        return t(key) || fallback || key;
-                    } catch {
-                        return fallback || key;
-                    }
-                }
-
-                return '';
-            })
+            .map(kw => parseValue(kw))
             .filter(Boolean);
 
         return resolved.join(', ');
@@ -92,31 +81,35 @@
      * Generate page title with translation support
      *
      * Uses genPageTitle() from @minejs/i18n for RTL-aware titles
-     * Detects if value is a translation key and uses it accordingly
+     * First parses the value to detect and translate if needed
      */
-    function resolvePageTitle(title: string | string[] | undefined): string {
+    function resolvePageTitle(title: string | undefined): string {
         if (!title) return 'Page';
 
-        let titleKey = '';
-
-        // Extract translation key if array
-        if (Array.isArray(title)) {
-            titleKey = title[0] || '';
-        } else {
-            titleKey = title;
-        }
+        // First parse the value to detect translation keys
+        const parsedTitle = parseValue(title);
 
         // Use genPageTitle for RTL-aware title generation
         try {
-            return genPageTitle(titleKey, '');
+            return genPageTitle(parsedTitle);
         } catch {
-            // Fallback: if genPageTitle fails, use direct value
-            if (Array.isArray(title)) {
-                return title[1] || title[0] || 'Page';
-            }
-            return title;
+            // Fallback: if genPageTitle fails, use parsed value
+            return parsedTitle;
         }
     }
+
+    /**
+     * Generate page title with proper RTL handling
+     *
+     * @example
+     * // English: "Profile - MyApp"
+     * // Arabic: "MyApp - الملف الشخصي"
+     */
+    export function genPageTitle(val: string): string {
+        const appName = t('app.name');
+        return isRTL() ? `${appName} - ${val}` : `${val} - ${appName}`;
+    }
+
 
     /**
      * Generate SEO Meta Tags with E-E-A-T signals and translation support

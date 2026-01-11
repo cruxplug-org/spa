@@ -15,26 +15,25 @@
      * - description, keywords, etc: Use t() for translations
      *
      * Meta tag values can be:
-     * - Direct string: 'My Title' or 'my.translation.key'
-     * - Array [key, fallback]: ['my.key', 'Fallback Title']
-     * - Array [key]: ['my.key'] (no fallback)
+     * - Direct string: 'My Title'
+     * - Translation key: 'my.translation.key'
      */
     export interface SPAPageConfig {
         // Page metadata
         // For title: can be translated via genPageTitle(key) for RTL support
-        // Format: string | [translationKey] | [translationKey, fallback]
-        title: string | string[];
+        // Format: string (direct value or translation key)
+        title: string;
         path: string;
 
         // SEO configuration
-        // Format: string | [translationKey] | [translationKey, fallback]
-        description?: string | string[];
-        keywords?: (string | string[])[];
+        // Format: string (direct value or translation key)
+        description?: string;
+        keywords?: string[];
 
         // E-E-A-T Signals (Google AI Overviews)
-        expertise?: string | string[];
-        experience?: string | string[];
-        authority?: string | string[];
+        expertise?: string;
+        experience?: string;
+        authority?: string;
 
         // Content type for AI indexing
         contentType?: 'article' | 'product' | 'service' | 'app' | 'workspace' | 'page';
