@@ -7,7 +7,7 @@
 // ╔════════════════════════════════════════ PACK ════════════════════════════════════════╗
 
     import type { SPAPageConfig, ServerSPAPluginConfig } from '../types';
-    import { t } from '@minejs/server';
+    import { tLang } from '@minejs/server';
     import { isRTL } from '@minejs/i18n';
 
 // ╚══════════════════════════════════════════════════════════════════════════════════════╝
@@ -33,7 +33,7 @@
      * @param defaultValue - Fallback if value is empty
      * @returns Translated value or original string
      */
-    function parseValue(value: string | undefined, defaultValue: string = ''): string {
+    function parseValue(value: string | undefined, defaultValue: string = '', lang: string = 'en'): string {
         if (!value) return defaultValue;
 
         // Check if value looks like a translation key (e.g., 'meta.home.title')
@@ -42,7 +42,7 @@
 
         if (isTranslationKey) {
             try {
-                const translated = t(value);
+                const translated = tLang(lang, value, undefined);
                 // If translation returns a value, use it; otherwise fall back to original
                 return translated || value;
             } catch {
@@ -59,19 +59,19 @@
      * Resolve meta tag values with smart translation detection
      * Uses parseValue() to automatically detect and translate
      */
-    function resolveMetaValue(value: string | undefined, defaultValue: string = ''): string {
-        return parseValue(value, defaultValue);
+    function resolveMetaValue(value: string | undefined, defaultValue: string = '', lang: string = 'en'): string {
+        return parseValue(value, defaultValue, lang);
     }
 
     /**
      * Resolve keywords with smart translation detection
      * Uses parseValue() on each keyword to automatically detect and translate
      */
-    function resolveKeywords(keywords: string[] | undefined): string {
+    function resolveKeywords(keywords: string[] | undefined, lang: string = 'en'): string {
         if (!keywords || keywords.length === 0) return '';
 
         const resolved = keywords
-            .map(kw => parseValue(kw))
+            .map(kw => parseValue(kw, '', lang))
             .filter(Boolean);
 
         return resolved.join(', ');
@@ -83,15 +83,14 @@
      * Uses genPageTitle() from @minejs/i18n for RTL-aware titles
      * First parses the value to detect and translate if needed
      */
-    function resolvePageTitle(title: string | undefined): string {
+    function resolvePageTitle(title: string | undefined, lang: string = 'en'): string {
         if (!title) return 'Page';
 
         // First parse the value to detect translation keys
-        const parsedTitle = parseValue(title);
-
+        const parsedTitle = parseValue(title, '', lang);
         // Use genPageTitle for RTL-aware title generation
         try {
-            return genPageTitle(parsedTitle);
+            return genPageTitle(parsedTitle, lang);
         } catch {
             // Fallback: if genPageTitle fails, use parsed value
             return parsedTitle;
@@ -105,8 +104,8 @@
      * // English: "Profile - MyApp"
      * // Arabic: "MyApp - الملف الشخصي"
      */
-    export function genPageTitle(val: string): string {
-        const appName = t('app.name');
+    export function genPageTitle(val: string, lang: string = 'en'): string {
+        const appName = tLang(lang, 'app.name', undefined);
         return isRTL() ? `${appName} - ${val}` : `${val} - ${appName}`;
     }
 
@@ -124,18 +123,19 @@
      */
     export function generateSEOMetaTags(
         config: SPAPageConfig,
-        baseConfig: ServerSPAPluginConfig
+        baseConfig: ServerSPAPluginConfig,
+        lang: string = 'en'
     ): string {
         const canonicalUrl = config.canonical || `${baseConfig.baseUrl}${config.path}`;
         const robots = config.robots || baseConfig.defaultRobots || 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 
         // Resolve translated values
-        const title = resolvePageTitle(config.title);
-        const description = resolveMetaValue(config.description, baseConfig.defaultDescription || 'A modern single-page application');
-        const keywords = resolveKeywords(config.keywords || baseConfig.defaultKeywords);
-        const expertise = resolveMetaValue(config.expertise, '');
-        const experience = resolveMetaValue(config.experience, '');
-        const authority = resolveMetaValue(config.authority, '');
+        const title = resolvePageTitle(config.title, lang);
+        const description = resolveMetaValue(config.description, baseConfig.defaultDescription || 'A modern single-page application', lang);
+        const keywords = resolveKeywords(config.keywords || baseConfig.defaultKeywords, lang);
+        const expertise = resolveMetaValue(config.expertise, '', lang);
+        const experience = resolveMetaValue(config.experience, '', lang);
+        const authority = resolveMetaValue(config.authority, '', lang);
 
         // Determine OG type based on content type
         const ogType = config.contentType === 'article' ? 'article' : 'website';
@@ -191,16 +191,17 @@
     export function generateStructuredData(
         pageConfig: SPAPageConfig,
         baseConfig: ServerSPAPluginConfig,
-        contentType: string = 'WebPage'
+        contentType: string = 'WebPage',
+        lang: string = 'en'
     ): string {
         const canonicalUrl = pageConfig.canonical || `${baseConfig.baseUrl}${pageConfig.path}`;
 
         // Resolve translated values for structured data
-        const title = resolvePageTitle(pageConfig.title);
-        const description = resolveMetaValue(pageConfig.description, baseConfig.defaultDescription);
-        const expertise = resolveMetaValue(pageConfig.expertise, '');
-        const experience = resolveMetaValue(pageConfig.experience, '');
-        const authority = resolveMetaValue(pageConfig.authority, '');
+        const title = resolvePageTitle(pageConfig.title, lang);
+        const description = resolveMetaValue(pageConfig.description, baseConfig.defaultDescription, lang);
+        const expertise = resolveMetaValue(pageConfig.expertise, '', lang);
+        const experience = resolveMetaValue(pageConfig.experience, '', lang);
+        const authority = resolveMetaValue(pageConfig.authority, '', lang);
 
         const schema = {
             '@context': 'https://schema.org',

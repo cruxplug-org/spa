@@ -87,7 +87,8 @@
     export function generateSPAHTML(
         pageConfig: SPAPageConfig,
         baseConfig: ServerSPAPluginConfig,
-        i18nConfig?: AppConfig['i18n']
+        i18nConfig?: AppConfig['i18n'],
+        lang: string = 'en'
     ): string {
         const clientScripts = pageConfig.clientScriptPath || baseConfig.clientScriptPath;
         const clientStyles = pageConfig.clientStylePath || baseConfig.clientStylePath || [];
@@ -110,10 +111,10 @@
 
         // Build raw HTML - GUARANTEE i18n meta tag is included!
         const rawHTML = `<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-${generateSEOMetaTags(pageConfig, baseConfig)}
-${generateStructuredData(pageConfig, baseConfig, pageConfig.contentType === 'article' ? 'Article' : 'WebPage')}
+${generateSEOMetaTags(pageConfig, baseConfig, lang)}
+${generateStructuredData(pageConfig, baseConfig, pageConfig.contentType === 'article' ? 'Article' : 'WebPage', lang)}
 ${i18nMetaTag}
 ${styleTags}
 </head>
@@ -154,7 +155,7 @@ ${scriptTags}
             method: 'GET',
             path: pageConfig.path,
             handler: (c: AppContext) => {
-                const html = generateSPAHTML(pageConfig, baseConfig, i18nConfig);
+                const html = generateSPAHTML(pageConfig, baseConfig, i18nConfig, c.lang || 'en');
                 return c.html(html);
             }
         };
