@@ -98,7 +98,7 @@
 
         const plugin: CruxPlugin & { __spaErrorHandler?: any } = {
             name: '@cruxplug/SPA',
-            version: '0.1.2',
+            version: '0.1.3',
 
             routes,
 
