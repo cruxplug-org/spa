@@ -46,12 +46,12 @@
      * Returns HTML for web requests and JSON for API requests
      * Automatically uses global i18n config (no need to pass it!)
      */
-    export function buildErrorResponse(
+    export async function buildErrorResponse(
         statusCode: number,
         errorPageMap: Map<number, ErrorPageConfig>,
         baseConfig: ServerSPAPluginConfig,
         path: string
-    ): ErrorResponse {
+    ): Promise<ErrorResponse> {
         // API requests get JSON responses
         if (path.startsWith('/api/')) {
             return {
@@ -67,7 +67,7 @@
             // Use global i18n config - unified approach!
             const i18nConfig = getGlobalI18nConfig();
             console.log(`[Errors] Generating error page ${statusCode} with i18n:`, !!i18nConfig);
-            const html = generateSPAHTML(errorConfig, baseConfig, i18nConfig);
+            const html = await generateSPAHTML(errorConfig, baseConfig, i18nConfig);
             return {
                 status: statusCode,
                 headers: { 'Content-Type': 'text/html; charset=utf-8' },
@@ -98,9 +98,9 @@
     export function createErrorHandler(
         errorPageMap: Map<number, ErrorPageConfig>,
         baseConfig: ServerSPAPluginConfig
-    ): (statusCode: number, path: string) => Response {
-        return (statusCode: number, path: string) => {
-            const errorResponse = buildErrorResponse(statusCode, errorPageMap, baseConfig, path);
+    ): (statusCode: number, path: string) => Promise<Response> {
+        return async (statusCode: number, path: string) => {
+            const errorResponse = await buildErrorResponse(statusCode, errorPageMap, baseConfig, path);
             return new Response(errorResponse.body, {
                 status: errorResponse.status,
                 headers: errorResponse.headers

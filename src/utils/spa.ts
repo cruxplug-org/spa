@@ -84,12 +84,12 @@
      *
      * Output is automatically formatted with proper indentation via formatHTML()
      */
-    export function generateSPAHTML(
+    export async function generateSPAHTML(
         pageConfig: SPAPageConfig,
         baseConfig: ServerSPAPluginConfig,
         i18nConfig?: AppConfig['i18n'],
         lang: string = 'en'
-    ): string {
+    ): Promise<string> {
         const clientScripts = pageConfig.clientScriptPath || baseConfig.clientScriptPath;
         const clientStyles = pageConfig.clientStylePath || baseConfig.clientStylePath || [];
 
@@ -113,8 +113,8 @@
         const rawHTML = `<!DOCTYPE html>
 <html>
 <head>
-${generateSEOMetaTags(pageConfig, baseConfig, lang)}
-${generateStructuredData(pageConfig, baseConfig, pageConfig.contentType === 'article' ? 'Article' : 'WebPage', lang)}
+${await generateSEOMetaTags(pageConfig, baseConfig, lang)}
+${await generateStructuredData(pageConfig, baseConfig, pageConfig.contentType === 'article' ? 'Article' : 'WebPage', lang)}
 ${i18nMetaTag}
 ${styleTags}
 </head>
@@ -154,8 +154,8 @@ ${scriptTags}
         return {
             method: 'GET',
             path: pageConfig.path,
-            handler: (c: AppContext) => {
-                const html = generateSPAHTML(pageConfig, baseConfig, i18nConfig, c.lang || 'en');
+            handler: async (c: AppContext) => {
+                const html = await generateSPAHTML(pageConfig, baseConfig, i18nConfig, c.lang || 'en');
                 return c.html(html);
             }
         };
