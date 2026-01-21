@@ -98,7 +98,7 @@
 
         const plugin: CruxPlugin & { __spaErrorHandler?: any } = {
             name: '@cruxplug/SPA',
-            version: '0.1.5',
+            version: '0.1.6',
 
             routes,
 
@@ -106,23 +106,18 @@
             __spaErrorHandler: errorHandler,
 
             onRegister: async (app: AppInstance) => {
-                // console.log(`[SPA Plugin] Registered ${routes.length} SPA routes`);
                 if (errorPageMap.size > 0) {
                     const statusCodes = Array.from(errorPageMap.keys()).join(', ');
-                    // console.log(`[SPA Plugin] Error pages configured for: ${statusCodes}`);
                 }
             },
 
             onAwake: async (ctx: any) => {
-                // console.log('[SPA Plugin] Awake phase - SPA routes ready');
             },
 
             onStart: async (ctx: any) => {
-                // console.log('[SPA Plugin] Start phase - serving SPA');
             },
 
             onReady: async (ctx: any) => {
-                // console.log('[SPA Plugin] Ready phase - SPA is fully operational');
             }
         };
 

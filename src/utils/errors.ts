@@ -66,7 +66,6 @@
             const errorConfig = errorPageMap.get(statusCode)!;
             // Use global i18n config - unified approach!
             const i18nConfig = getGlobalI18nConfig();
-            console.log(`[Errors] Generating error page ${statusCode} with i18n:`, !!i18nConfig);
             const html = await generateSPAHTML(errorConfig, baseConfig, i18nConfig);
             return {
                 status: statusCode,
@@ -75,7 +74,6 @@
             };
         }
 
-        console.log(`[Errors] No custom error page for ${statusCode}, returning fallback`);
         // Fallback: plain text error
         return {
             status: statusCode,
