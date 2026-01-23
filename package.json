@@ -1,6 +1,6 @@
 {
 	"name"                             : "@cruxplug/spa",
-	"version"                          : "0.1.6",
+	"version"                          : "0.1.7",
 	"description"                      : "Single Page Application (SPA) plugin for CruxJS with built-in SEO/CEO support, E-E-A-T signals, and JSON-LD structured data generation.",
 	"keywords"                         : [
 		"cruxjs",

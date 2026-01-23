@@ -161,7 +161,6 @@
                 <meta name="theme-color" content="#000000" />
                 <!-- 🔗 Canonical & Prefetch -->
                 <link rel="canonical" href="${canonicalUrl}" />
-                ${(config.clientScriptPath || baseConfig.clientScriptPath)?.map(script => `<link rel="prefetch" href="${script}" />`).join('\n')}
                 <!-- ⚡ Performance & Security -->
                 <meta name="format-detection" content="telephone=no" />
                 <meta http-equiv="x-ua-compatible" content="IE=edge" />
