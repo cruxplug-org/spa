@@ -161,6 +161,7 @@
                 <meta name="theme-color" content="#000000" />
                 <!-- 🔗 Canonical & Prefetch -->
                 <link rel="canonical" href="${canonicalUrl}" />
+                ${baseConfig.favicon ? `<link rel="icon" href="${baseConfig.favicon}" />` : ''}
                 <!-- ⚡ Performance & Security -->
                 <meta name="format-detection" content="telephone=no" />
                 <meta http-equiv="x-ua-compatible" content="IE=edge" />

@@ -88,6 +88,7 @@
         defaultDescription?: string;
         defaultKeywords?: string[];
         defaultRobots?: string;
+        favicon?: string;
 
         // Enable automatic 404 handling for unmatched routes
         // If true and no 404 page defined, creates a default one

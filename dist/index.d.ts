@@ -54,6 +54,7 @@ interface ServerSPAPluginConfig {
     defaultDescription?: string;
     defaultKeywords?: string[];
     defaultRobots?: string;
+    favicon?: string;
     enableAutoNotFound?: boolean;
 }
 
